@@ -1,0 +1,65 @@
+rule signContract {
+    description: "Allow all participants to submit Sign transactions"
+    participant: "ANY"
+    operation: ALL
+    resource: "org.example.biznet.ledgerTransaction"
+    action: ALLOW
+}
+
+rule createContractTransaction {
+  description: "Allow all members to create contracts by using a transaction"
+  participant:"ANY"
+  operation: CREATE
+  resource:"org.example.biznet.createContract"
+  action: ALLOW
+}
+
+rule createContract {
+  description: "Allow all members to create contracts"
+  participant:"ANY"
+  operation: CREATE
+  resource:"org.example.biznet.contract"
+  action: ALLOW
+}
+
+rule OwnContractFullAccess {
+    description: "Allow all participants read access to their own contracts"
+    participant(p): "org.example.biznet.Member"
+    operation: READ, UPDATE
+    resource(r): "org.example.biznet.contract"
+    condition: (r.creator.getIdentifier() === p.getIdentifier() || r.signator.getIdentifier() === p.getIdentifier())
+    action: ALLOW
+}
+
+rule OwnRecordFullAccess {
+    description: "Allow all participants read access to their own records"
+    participant(t): "org.example.biznet.Member"
+    operation: READ, UPDATE
+    resource(v): "org.example.biznet.Member"
+    condition: (t.getIdentifier() == v.getIdentifier())
+    action: ALLOW
+}
+
+rule SystemACL {
+    description:  "System ACL to permit all access"
+    participant: "org.hyperledger.composer.system.Participant"
+    operation: ALL
+    resource: "org.hyperledger.composer.system.**"
+    action: ALLOW
+}
+
+rule NetworkAdminUser {
+    description: "Grant business network administrators full access to user resources"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "**"
+    action: ALLOW
+}
+
+rule NetworkAdminSystem {
+    description: "Grant business network administrators full access to system resources"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "org.hyperledger.composer.system.**"
+    action: ALLOW
+}
